@@ -1,0 +1,37 @@
+# Render Blueprint:New > Blueprint,選這個 repo 即可建立 Web Service + Key Value(Redis)
+services:
+  - type: web
+    name: line-gemini-bot
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: LINE_CHANNEL_SECRET
+        sync: false          # 在 Render Dashboard 手動填,不進版控
+      - key: LINE_CHANNEL_ACCESS_TOKEN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      - key: MEMORY_BACKEND
+        value: redis
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: line-bot-memory
+          property: connectionString
+      - key: MEMORY_MAX_TURNS
+        value: "10"
+      - key: MEMORY_TTL_MINUTES
+        value: "30"
+
+  - type: keyvalue
+    name: line-bot-memory
+    plan: free
+    region: singapore
+    maxmemoryPolicy: volatile-lru
+    ipAllowList: []          # 只允許 Render 內網連線

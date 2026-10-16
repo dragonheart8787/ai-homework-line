@@ -1,0 +1,6 @@
+fastapi==0.143.2
+uvicorn[standard]==0.54.0
+line-bot-sdk==3.26.0
+google-genai==2.31.0
+redis==8.1.0
+httpx==0.28.1
