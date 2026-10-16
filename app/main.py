@@ -60,7 +60,8 @@ def create_app(settings: Settings | None = None, store: MemoryStore | None = Non
 
     app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
 
-    @app.get("/healthz")
+    # UptimeRobot 等監控預設用 HEAD;伺服器會自動不送 body
+    @app.api_route("/healthz", methods=["GET", "HEAD"])
     async def healthz():
         return {"status": "ok"}
 

@@ -126,6 +126,20 @@ def test_healthz_no_leak(harness, settings):
     assert settings.line_channel_secret not in r.text
 
 
+def test_healthz_get_and_head(harness):
+    r = harness.get("/healthz")
+    assert r.status_code == 200 and r.json() == {"status": "ok"}
+    r = harness.head("/healthz")
+    assert r.status_code == 200 and r.content == b""
+
+
+@pytest.mark.parametrize("method", ["get", "head"])
+def test_callback_rejects_get_and_head(harness, method):
+    r = getattr(harness, method)("/callback")
+    assert r.status_code == 405
+    assert r.headers["allow"] == "POST"
+
+
 def test_missing_env_fails_fast():
     with pytest.raises(ConfigError) as e:
         load_settings({"LINE_CHANNEL_SECRET": "x"})
